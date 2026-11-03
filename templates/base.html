@@ -1,0 +1,14 @@
+<!doctype html><html lang="so"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Java's Restaurant — cunto si taxaddar leh loogu diyaariyo dadka bukaanka ah ee jooga isbitaallada Hyderabad.">
+<title>{% block title %}JAVA'S RESTAURANT{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><div class="topbar">Hyderabad, India <span>•</span> Adeegga cuntada bukaannada</div>
+<header class="site-header"><a class="brand" href="{{ url_for('home') }}"><span class="brand-mark">♨</span><span>JAVA'S<small>RESTAURANT</small></span></a>
+<button class="menu-toggle" aria-label="Fur menu" aria-expanded="false">☰</button><nav class="nav">
+<a href="{{ url_for('home') }}">Home</a><a href="{{ url_for('services') }}">Services</a><a href="{{ url_for('about') }}">About Us</a><a href="{{ url_for('menu') }}">Menu</a><a href="{{ url_for('contact') }}">Contact</a>
+{% if session.get('customer_id') %}<a class="nav-cta" href="{{ url_for('customer_dashboard') }}">My Account</a>{% elif session.get('is_admin') %}<a class="nav-cta" href="{{ url_for('admin_dashboard') }}">Admin</a>{% else %}<a href="{{ url_for('login') }}">Login</a><a class="nav-cta" href="{{ url_for('register') }}">Register</a>{% endif %}
+</nav></header>
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-wrap">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+<main>{% block content %}{% endblock %}</main>
+<footer><div class="footer-brand">JAVA'S RESTAURANT</div><p>Cunto nadiif ah, adeeg naxariis leh.</p><p>Hyderabad, India · WhatsApp: +254 795 771 818</p><small>© 2026 Java's Restaurant. Dhammaan xuquuqdu way dhowran tahay.</small></footer>
+<a class="whatsapp-float" href="https://wa.me/254795771818?text=Salaan%20Java's%20Restaurant%2C%20waxaan%20rabaa%20inaan%20wax%20weydiiyo." target="_blank" rel="noopener" aria-label="Kala xiriir WhatsApp">☏<span>WhatsApp</span></a>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script></body></html>

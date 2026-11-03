@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}Booking{% endblock %}{% block content %}
+<section class="form-section"><form class="form-card wide" method="post">
+<span class="eyebrow">30-DAY MEAL SERVICE</span><h1>Dalbo adeegga cuntada</h1>
+<div class="notice"><strong>Xirmada adeegga:</strong> 30 maalmood oo joogto ah — quraac, qado iyo casho. <strong>Qiime go'an ma jiro.</strong> Marka aad booking-ka dirto, shaqaalaha JAVA'S RESTAURANT ayaa telefoon kula soo xiriiraya si aad uga heshiisaan qiimaha iyo faahfaahinta adeegga.</div>
+<label>Nooca cuntada / codsigaaga<select name="meal_type" required><option value="">Dooro</option><option>Cunto bukaan</option><option>Cunto fudud</option><option>Cunto qoyska</option><option>Cunto kale / codsi gaar ah</option></select></label>
+<label>Isbitaalka<input name="hospital" placeholder="Magaca isbitaalka" required></label>
+<label>Cinwaanka gaarsiinta<textarea name="delivery_address" required></textarea></label>
+<label>Taariikhda la bilaabayo<input type="date" name="delivery_date" required></label>
+<label>Waqtiga cuntada koowaad la keenayo<input type="time" name="delivery_time" required></label>
+<label>Tilmaamaha cuntada / xasaasiyadda<textarea name="diet_notes" placeholder="Ku qor talada dhakhtarka, xasaasiyadda, maaddooyinka laga fogaado..."></textarea></label>
+<div class="package-summary"><b>Waxa ku jira:</b><span>Quraac · Qado · Casho</span><b>Muddada:</b><span>30 maalmood</span><b>Lacagta:</b><span>Telefoon ayaa lagu heshiinayaa ka dib marka booking-ka la helo.</span></div>
+<button class="btn" type="submit">Dir Booking</button><p class="form-note">Dirista booking-ku ma aha xaqiijin qiime ama lacag-bixin. Waxaan kula soo xiriiri doonnaa telefoon si aan uga heshiinno qiimaha, cuntada iyo gaarsiinta.</p>
+</form></section>{% endblock %}
