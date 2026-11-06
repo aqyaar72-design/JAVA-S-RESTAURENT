@@ -9,6 +9,7 @@ from flask import (
 )
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import make_url
+from sqlalchemy import text
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
 
@@ -206,23 +207,59 @@ def login():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
 
-        # Admin credentials are read from Vercel Environment Variables.
-        # Remove accidental surrounding whitespace from the stored values.
-        admin_email = os.getenv("ADMIN_EMAIL", "").strip().lower()
-        admin_password = os.getenv("ADMIN_PASSWORD", "").strip()
+        # Admin authentication is handled by Supabase Auth.
+        supabase_url = os.getenv("SUPABASE_URL", "").strip().rstrip("/")
+        supabase_key = os.getenv("SUPABASE_ANON_KEY", "").strip()
 
-        # Admin login
-        if (
-            admin_email
-            and admin_password
-            and email == admin_email
-            and password == admin_password
-        ):
-            session.clear()
-            session["is_admin"] = True
-            return redirect(url_for("admin_dashboard"))
+        if supabase_url and supabase_key:
+            try:
+                auth_response = requests.post(
+                    f"{supabase_url}/auth/v1/token?grant_type=password",
+                    headers={
+                        "apikey": supabase_key,
+                        "Content-Type": "application/json",
+                    },
+                    json={"email": email, "password": password},
+                    timeout=15,
+                )
 
-        # Customer login
+                if auth_response.ok:
+                    auth_data = auth_response.json()
+                    user_id = (auth_data.get("user") or {}).get("id")
+
+                    if user_id:
+                        admin_record = db.session.execute(
+                            text("""
+                                SELECT user_id
+                                FROM public.admin_users
+                                WHERE user_id = :user_id
+                                LIMIT 1
+                            """),
+                            {"user_id": user_id},
+                        ).first()
+
+                        if admin_record:
+                            session.clear()
+                            session["is_admin"] = True
+                            session["admin_user_id"] = user_id
+                            return redirect(url_for("admin_dashboard"))
+                else:
+                    app.logger.info(
+                        "Supabase Admin sign-in was not accepted (HTTP %s).",
+                        auth_response.status_code,
+                    )
+
+            except requests.RequestException:
+                app.logger.exception("Supabase Admin sign-in request failed.")
+            except Exception:
+                db.session.rollback()
+                app.logger.exception("Admin authorization lookup failed.")
+        else:
+            app.logger.error(
+                "SUPABASE_URL or SUPABASE_ANON_KEY is missing from the environment."
+            )
+
+        # Existing customer login remains available and unchanged.
         customer = Customer.query.filter_by(email=email).first()
         if customer and check_password_hash(customer.password_hash, password):
             session.clear()
