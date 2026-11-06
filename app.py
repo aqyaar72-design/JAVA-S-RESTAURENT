@@ -206,19 +206,27 @@ def login():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
 
+        # Admin credentials are read from Vercel Environment Variables.
+        # Remove accidental surrounding whitespace from the stored values.
+        admin_email = os.getenv("ADMIN_EMAIL", "").strip().lower()
+        admin_password = os.getenv("ADMIN_PASSWORD", "").strip()
+
+        # Admin login
         if (
-            email
-            and email == os.getenv("ADMIN_EMAIL", "").strip().lower()
-            and password == os.getenv("ADMIN_PASSWORD", "")
+            admin_email
+            and admin_password
+            and email == admin_email
+            and password == admin_password
         ):
+            session.clear()
             session["is_admin"] = True
-            session.pop("customer_id", None)
             return redirect(url_for("admin_dashboard"))
 
+        # Customer login
         customer = Customer.query.filter_by(email=email).first()
         if customer and check_password_hash(customer.password_hash, password):
+            session.clear()
             session["customer_id"] = customer.id
-            session.pop("is_admin", None)
             return redirect(url_for("customer_dashboard"))
 
         flash("Email ama password khaldan.", "error")
